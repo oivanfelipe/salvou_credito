@@ -1010,22 +1010,26 @@ body {
         <div style="font-size:13px;color:var(--ink);line-height:1.6;">Grupo de WhatsApp com a equipe · Respostas rápidas · Alinhamento contínuo</div>
       </div>
     </div>
-    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:48px 32px;background:#0D0D0D;border-radius:16px;text-align:center;">
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:40px 32px;background:#F4F4F4;border-radius:16px;text-align:center;border:1.5px solid #E0E0E0;">
       <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--red);">Investimento mensal</div>
-      <div id="price-box" onclick="document.getElementById('price-hidden').style.display='none';document.getElementById('price-shown').style.display='block';this.style.cursor='default';this.style.border='none';this.style.background='transparent';" style="cursor:pointer;user-select:none;border:2px dashed rgba(255,255,255,0.25);border-radius:12px;padding:20px 28px;transition:border-color 0.2s;" onmouseover="if(document.getElementById('price-hidden').style.display!=='none')this.style.borderColor='rgba(255,255,255,0.5)';" onmouseout="if(document.getElementById('price-hidden').style.display!=='none')this.style.borderColor='rgba(255,255,255,0.25)';">
+      <div id="price-box" onclick="document.getElementById('price-hidden').style.display='none';document.getElementById('price-shown').style.display='block';this.style.cursor='default';this.style.border='2px solid transparent';" style="cursor:pointer;user-select:none;border:2px dashed #AAAAAA;border-radius:12px;padding:20px 28px;transition:border-color 0.2s;" onmouseover="if(document.getElementById('price-hidden').style.display!=='none')this.style.borderColor='#333';" onmouseout="if(document.getElementById('price-hidden').style.display!=='none')this.style.borderColor='#AAAAAA';">
         <div id="price-hidden">
-          <div style="font-family:var(--font-d);font-size:clamp(36px,5vw,56px);font-weight:700;color:rgba(255,255,255,0.2);letter-spacing:0.25em;line-height:1;">● ● ●</div>
-          <div style="display:inline-flex;align-items:center;gap:6px;margin-top:12px;padding:6px 14px;background:rgba(255,255,255,0.08);border-radius:100px;font-size:11px;font-weight:600;color:rgba(255,255,255,0.5);letter-spacing:0.06em;text-transform:uppercase;">
+          <div style="font-family:var(--font-d);font-size:clamp(36px,5vw,56px);font-weight:700;color:#CCCCCC;letter-spacing:0.25em;line-height:1;">● ● ●</div>
+          <div style="display:inline-flex;align-items:center;gap:6px;margin-top:12px;padding:6px 14px;background:#E0E0E0;border-radius:100px;font-size:11px;font-weight:600;color:#777;letter-spacing:0.06em;text-transform:uppercase;">
             <span>👁</span> clique para revelar
           </div>
         </div>
         <div id="price-shown" style="display:none;">
-          <div style="font-family:var(--font-d);font-size:clamp(36px,5vw,60px);font-weight:700;color:#fff;letter-spacing:-0.02em;line-height:1;">R$ <span style="color:var(--red);">8.000</span></div>
+          <div style="font-family:var(--font-d);font-size:clamp(36px,5vw,64px);font-weight:700;color:#0D0D0D;letter-spacing:-0.02em;line-height:1;">R$ 8.000</div>
+          <div style="font-size:12px;color:#777;margin-top:8px;letter-spacing:0.04em;">por mês</div>
         </div>
       </div>
-      <div style="font-size:12px;color:rgba(255,255,255,0.25);margin-top:-8px;">gestão · sem taxa de setup</div>
-      <div style="width:100%;height:1px;background:rgba(255,255,255,0.08);margin:8px 0;"></div>
-      <div style="font-size:12px;color:rgba(255,255,255,0.4);line-height:1.6;">Contrato mensal · renovável<br>Início na semana do kick-off</div>
+      <div style="width:100%;height:1px;background:#E0E0E0;margin:4px 0;"></div>
+      <div style="font-size:12px;color:#777;line-height:1.7;">
+        Sem taxa de setup<br>
+        <strong style="color:#0D0D0D;">Comprometimento mínimo: 6 meses</strong><br>
+        Início na semana do kick-off
+      </div>
     </div>
   </div>
 </section>
