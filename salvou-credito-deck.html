@@ -1,1237 +1,998 @@
 <title>Salvou Crédito</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap">
 
 <style>
+/* ─── TOKENS ──────────────────────────────────────────── */
 :root {
-  --bg: #FFFFFF;
-  --ink: #0D0D0D;
-  --ink-muted: #6A6A6A;
-  --red: #CC1A1A;
-  --red-pop: #E02020;
-  --red-tint: rgba(204,26,26,0.07);
-  --surface: #F5F5F5;
-  --border: #E0E0E0;
-  --font-display: 'Oswald', Arial Narrow, sans-serif;
-  --font-body: 'DM Sans', system-ui, sans-serif;
+  --bg:       #FFFFFF;
+  --ink:      #0D0D0D;
+  --muted:    #6B6B6B;
+  --red:      #CC1A1A;
+  --red-t:    rgba(204,26,26,0.08);
+  --surf:     #F4F4F4;
+  --bdr:      #E0E0E0;
+  --font-d:   'Oswald', Arial Narrow, sans-serif;
+  --font-b:   'DM Sans', system-ui, sans-serif;
 }
-
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #0D0D0D;
-    --ink: #F2F2F2;
-    --ink-muted: #888;
-    --red: #E03030;
-    --red-pop: #FF4040;
-    --red-tint: rgba(224,48,48,0.10);
-    --surface: #181818;
-    --border: #2A2A2A;
+    --bg:     #111111;
+    --ink:    #F0F0F0;
+    --muted:  #888888;
+    --red:    #E03535;
+    --red-t:  rgba(224,53,53,0.10);
+    --surf:   #1C1C1C;
+    --bdr:    #2A2A2A;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #0D0D0D;
-  --ink: #F2F2F2;
-  --ink-muted: #888;
-  --red: #E03030;
-  --red-pop: #FF4040;
-  --red-tint: rgba(224,48,48,0.10);
-  --surface: #181818;
-  --border: #2A2A2A;
+  --bg:     #111111;
+  --ink:    #F0F0F0;
+  --muted:  #888888;
+  --red:    #E03535;
+  --red-t:  rgba(224,53,53,0.10);
+  --surf:   #1C1C1C;
+  --bdr:    #2A2A2A;
 }
 
+/* ─── BASE ────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { width: 100%; height: 100%; overflow: hidden; background: var(--bg); }
-
-.viewport {
-  width: 100vw; height: 100vh;
-  display: flex; align-items: center; justify-content: center;
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-b);
   background: var(--bg);
-}
-
-.deck {
-  width: 1280px; height: 720px;
-  transform-origin: center center;
-  position: relative;
-}
-
-/* ── SLIDES ───────────────────────────────────── */
-.slide {
-  display: none;
-  position: absolute; inset: 0;
-  width: 1280px; height: 720px;
-  overflow: hidden;
-  background: var(--bg);
-  font-family: var(--font-body);
   color: var(--ink);
-}
-.slide.active { display: block; }
-
-/* ── NAV ───────────────────────────────────── */
-.nav-dots {
-  position: fixed; bottom: 28px; left: 50%;
-  transform: translateX(-50%);
-  display: flex; gap: 8px; align-items: center;
-  z-index: 200;
-}
-.dot {
-  width: 8px; height: 8px; border-radius: 50%;
-  background: var(--border); cursor: pointer;
-  transition: all 0.25s;
-}
-.dot.on { width: 28px; border-radius: 4px; background: var(--red); }
-
-.slide-num {
-  position: fixed; bottom: 28px; right: 48px;
-  font-family: var(--font-body);
-  font-size: 12px; font-weight: 600;
-  letter-spacing: 0.08em;
-  color: var(--ink-muted);
-  z-index: 200;
-  font-variant-numeric: tabular-nums;
+  overflow-x: hidden;
 }
 
-/* ── SHARED ATOMS ────────────────────────────── */
+/* ─── NAV BAR ─────────────────────────────────────────── */
+.topnav {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--bg);
+  border-bottom: 1px solid var(--bdr);
+  padding: 0 48px;
+  display: flex; align-items: center; gap: 4px;
+  height: 44px;
+  overflow-x: auto; overflow-y: hidden;
+  scrollbar-width: none;
+}
+.topnav::-webkit-scrollbar { display: none; }
+.topnav a {
+  flex-shrink: 0;
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  text-decoration: none;
+  color: var(--muted);
+  padding: 4px 12px; border-radius: 100px;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.topnav a:hover, .topnav a.on { color: var(--red); background: var(--red-t); }
+
+/* ─── PAGE SECTIONS ───────────────────────────────────── */
+.pg {
+  min-height: 100vh;
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 72px 80px;
+  border-bottom: 1px solid var(--bdr);
+  position: relative;
+  background: var(--bg);
+}
+.pg-id { display: none; } /* anchor targets */
+
+/* ─── DARK PAGES ─────────────────────────────────────── */
+/* Hardcoded so they stay dark regardless of system theme */
+.pg.dark {
+  background: #0D0D0D;
+  color: #F0F0F0;
+  border-bottom-color: #222;
+}
+
+/* ─── ATOMS ───────────────────────────────────────────── */
 .eyebrow {
-  font-family: var(--font-body);
   font-size: 11px; font-weight: 600;
   letter-spacing: 0.12em; text-transform: uppercase;
-  color: var(--red); margin-bottom: 14px;
+  color: var(--red); margin-bottom: 12px;
 }
+.redbar { width: 44px; height: 4px; background: var(--red); border-radius: 2px; margin-bottom: 28px; }
 
 .h1 {
-  font-family: var(--font-display);
-  font-size: 52px; font-weight: 700;
-  line-height: 1.05; letter-spacing: 0.01em;
-  text-transform: uppercase;
-  color: var(--ink);
+  font-family: var(--font-d);
+  font-size: 52px; font-weight: 700; line-height: 1.05;
+  text-transform: uppercase; letter-spacing: 0.01em;
   text-wrap: balance;
 }
 .h1 em { font-style: normal; color: var(--red); }
-.h1 span.lo { color: var(--ink-muted); }
 
 .h2 {
-  font-family: var(--font-display);
-  font-size: 36px; font-weight: 600;
+  font-family: var(--font-d);
+  font-size: 36px; font-weight: 600; line-height: 1.1;
   text-transform: uppercase; letter-spacing: 0.01em;
-  color: var(--ink); line-height: 1.1;
 }
+.h2 em { font-style: normal; color: var(--red); }
 
-.body {
-  font-size: 16px; font-weight: 400;
-  color: var(--ink-muted); line-height: 1.65;
-}
-
-.redbar { width: 44px; height: 4px; background: var(--red); border-radius: 2px; margin-bottom: 32px; }
+.body { font-size: 16px; line-height: 1.65; color: var(--muted); }
 
 .card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 28px 32px;
+  background: var(--surf); border: 1px solid var(--bdr);
+  border-radius: 12px; padding: 24px 28px;
 }
 .card.accent {
-  background: var(--red-tint);
-  border-color: rgba(204,26,26,0.25);
+  background: var(--red-t);
+  border-color: rgba(204,26,26,0.22);
+}
+
+.num {
+  font-family: var(--font-d);
+  font-size: 60px; font-weight: 700; line-height: 1;
+  color: var(--red); font-variant-numeric: tabular-nums;
+}
+.num-lbl {
+  font-size: 12px; font-weight: 500; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--muted); margin-top: 8px;
 }
 
 .tag {
-  display: inline-block;
-  padding: 3px 11px; border-radius: 100px;
-  font-size: 10px; font-weight: 700;
-  letter-spacing: 0.1em; text-transform: uppercase;
+  display: inline-block; padding: 3px 11px; border-radius: 100px;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
 }
-.tag-red { background: var(--red-tint); color: var(--red); }
-.tag-gray { background: var(--surface); color: var(--ink-muted); border: 1px solid var(--border); }
-.tag-dark { background: var(--ink); color: white; }
+.tag-r { background: var(--red-t); color: var(--red); }
+.tag-g { background: var(--surf); color: var(--muted); border: 1px solid var(--bdr); }
 
-.num {
-  font-family: var(--font-display);
-  font-size: 64px; font-weight: 700;
-  line-height: 1; color: var(--red);
-  font-variant-numeric: tabular-nums;
-}
-.num-label {
-  font-size: 13px; font-weight: 500;
-  text-transform: uppercase; letter-spacing: 0.08em;
-  color: var(--ink-muted); margin-top: 8px;
-}
-
-/* ── SLIDE 1: CAPA ────────────────────────────── */
-#s1 {
-  background: var(--ink);
-  display: none;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 64px 80px;
-}
-#s1.active { display: flex; }
-
-.s1-bar {
-  display: flex; justify-content: space-between;
+/* ─── TWO-COL ──────────────────────────────────────────── */
+.two-col {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 64px;
   align-items: center;
 }
-.s1-logos {
-  font-family: var(--font-body);
-  font-size: 12px; font-weight: 600;
-  letter-spacing: 0.1em; text-transform: uppercase;
-  color: rgba(255,255,255,0.3);
+.two-col.left-wide { grid-template-columns: 420px 1fr; }
+.two-col.right-wide { grid-template-columns: 1fr 420px; }
+
+/* ─── SLIDE 1: CAPA ────────────────────────────────────── */
+.capa-logos {
   display: flex; gap: 10px; align-items: center;
+  font-size: 12px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
 }
-.s1-logos .sep { color: rgba(255,255,255,0.12); }
-.s1-logos .client { color: rgba(255,255,255,0.7); }
-.s1-badge {
-  font-size: 10px; font-weight: 600; letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--red); border: 1px solid var(--red);
-  padding: 5px 12px; border-radius: 100px;
+.capa-logos .sep { color: rgba(255,255,255,0.12); }
+.capa-logos .client { color: rgba(255,255,255,0.75); }
+.capa-badge {
+  display: inline-block; font-size: 10px; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  border: 1px solid var(--red); color: var(--red);
+  padding: 5px 14px; border-radius: 100px;
 }
-.s1-center {
-  flex: 1; display: flex;
-  flex-direction: column; justify-content: center;
-  padding: 32px 0;
+.capa-title {
+  font-family: var(--font-d);
+  font-size: 96px; font-weight: 700;
+  text-transform: uppercase; line-height: 0.92; letter-spacing: 0.01em;
+  color: #FFFFFF;
 }
-.s1-eyebrow {
-  font-size: 11px; font-weight: 600;
-  letter-spacing: 0.14em; text-transform: uppercase;
-  color: var(--red); margin-bottom: 20px;
-}
-.s1-title {
-  font-family: var(--font-display);
-  font-size: 90px; font-weight: 700;
-  line-height: 0.95; letter-spacing: 0.01em;
-  text-transform: uppercase;
-  color: white;
-  margin-bottom: 20px;
-}
-.s1-title .red { color: var(--red); }
-.s1-sub {
-  font-size: 18px; font-weight: 300;
-  color: rgba(255,255,255,0.45);
-  max-width: 560px; line-height: 1.55;
-}
-.s1-footer {
+.capa-title .red { color: var(--red); }
+.capa-sub { font-size: 18px; font-weight: 300; color: rgba(255,255,255,0.45); line-height: 1.55; max-width: 520px; }
+.capa-footer {
   border-top: 1px solid rgba(255,255,255,0.07);
-  padding-top: 24px;
+  padding-top: 20px;
   display: flex; justify-content: space-between; align-items: center;
 }
-.s1-date {
-  font-size: 12px; color: rgba(255,255,255,0.3);
-  font-weight: 500; letter-spacing: 0.05em;
-}
+.capa-date { font-size: 12px; color: rgba(255,255,255,0.28); font-weight: 500; letter-spacing: 0.05em; }
 
-/* ── SLIDE 2: MERCADO ─────────────────────────── */
-#s2 { display: none; }
-#s2.active { display: block; }
+/* ─── SLIDE 2: MERCADO ─────────────────────────────────── */
+.stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.stat-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.alert-box {
+  display: flex; gap: 14px; align-items: flex-start;
+  padding: 18px 20px; border-radius: 10px;
+  background: var(--red-t); border: 1px solid rgba(204,26,26,0.2);
+}
+.alert-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
 
-.s2-layout {
-  display: grid; grid-template-columns: 1fr 1fr;
-  height: 100%;
-}
-.s2-left {
-  padding: 64px 64px 64px 80px;
-  display: flex; flex-direction: column; justify-content: center;
-  border-right: 1px solid var(--border);
-}
-.s2-right {
-  padding: 64px 80px 64px 64px;
-  display: flex; flex-direction: column; justify-content: center;
-  gap: 20px;
-}
-.s2-stat { display: flex; flex-direction: column; }
-
-/* ── SLIDE 3: DIAGNÓSTICO ─────────────────────── */
-#s3 { display: none; }
-#s3.active { display: block; }
-
-.s3-layout {
-  display: grid; grid-template-columns: 400px 1fr;
-  height: 100%;
-}
-.s3-left {
-  padding: 64px 48px 64px 80px;
-  display: flex; flex-direction: column; justify-content: center;
-  border-right: 1px solid var(--border);
-}
-.s3-right {
-  padding: 64px 80px 64px 48px;
-  display: flex; flex-direction: column; justify-content: center;
-  gap: 16px;
-}
+/* ─── SLIDE 3: DIAGNÓSTICO ─────────────────────────────── */
+.diag-list { display: flex; flex-direction: column; gap: 14px; }
 .diag-item {
-  display: flex; gap: 16px; align-items: flex-start;
-  padding: 18px 22px;
-  background: var(--surface);
-  border-radius: 10px;
-  border-left: 3px solid transparent;
+  display: flex; gap: 14px; align-items: flex-start;
+  padding: 18px 22px; border-radius: 10px;
+  background: var(--surf); border-left: 3px solid var(--bdr);
 }
 .diag-item.bad { border-left-color: var(--red); }
-.diag-item.good { border-left-color: #22C55E; }
+.diag-item.ok  { border-left-color: #22C55E; }
 .diag-item.now { border-left-color: #F59E0B; }
 .diag-dot {
   width: 10px; height: 10px; border-radius: 50%;
-  margin-top: 4px; flex-shrink: 0;
+  flex-shrink: 0; margin-top: 5px;
 }
 .diag-item.bad .diag-dot { background: var(--red); }
-.diag-item.good .diag-dot { background: #22C55E; }
+.diag-item.ok  .diag-dot { background: #22C55E; }
 .diag-item.now .diag-dot { background: #F59E0B; }
-.diag-text-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-muted); margin-bottom: 3px; }
-.diag-text-val { font-size: 15px; font-weight: 600; color: var(--ink); }
-.diag-text-sub { font-size: 13px; color: var(--ink-muted); margin-top: 2px; }
+.diag-lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 3px; }
+.diag-val { font-size: 15px; font-weight: 600; color: var(--ink); }
+.diag-sub { font-size: 13px; color: var(--muted); margin-top: 3px; line-height: 1.5; }
 
-/* ── SLIDE 4: TRÊS PRODUTOS ──────────────────── */
-#s4 { display: none; }
-#s4.active { display: block; }
+.metrics-strip { display: flex; gap: 12px; margin-top: 20px; }
+.metric-chip {
+  padding: 10px 16px; border-radius: 8px;
+  background: var(--surf); border: 1px solid var(--bdr);
+  text-align: center; flex: 1;
+}
+.metric-chip .val { font-family: var(--font-d); font-size: 22px; font-weight: 700; color: var(--ink); }
+.metric-chip .lbl { font-size: 11px; color: var(--muted); margin-top: 3px; font-weight: 500; }
 
-.s4-header {
-  padding: 52px 80px 0;
-}
-.s4-products {
-  display: grid; grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-  padding: 32px 80px 60px;
-  height: calc(100% - 160px);
-}
+/* ─── SLIDE 4: TRÊS PRODUTOS ───────────────────────────── */
+.product-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 36px; }
 .product-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 32px 28px;
-  display: flex; flex-direction: column; gap: 16px;
+  background: var(--surf); border: 1px solid var(--bdr);
+  border-radius: 14px; padding: 30px 26px;
+  display: flex; flex-direction: column; gap: 14px;
   position: relative; overflow: hidden;
 }
 .product-card::before {
-  content: '';
-  position: absolute; top: 0; left: 0; right: 0;
-  height: 4px; background: var(--border);
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
 }
-.product-card.p1::before { background: #3B82F6; }
-.product-card.p2::before { background: var(--red); }
-.product-card.p3::before { background: #10B981; }
-.product-icon { font-size: 28px; }
-.product-name {
-  font-family: var(--font-display);
-  font-size: 22px; font-weight: 700;
+.p-blue::before { background: #3B82F6; }
+.p-red::before  { background: var(--red); }
+.p-green::before { background: #10B981; }
+.p-icon { font-size: 28px; }
+.p-name {
+  font-family: var(--font-d); font-size: 22px; font-weight: 700;
   text-transform: uppercase; letter-spacing: 0.02em;
-  color: var(--ink);
 }
-.product-status {
-  display: inline-flex; align-items: center; gap: 6px;
-  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+.p-badge { display: flex; align-items: center; gap: 6px; }
+.p-dot { width: 8px; height: 8px; border-radius: 50%; }
+.p-dot-b { background: #3B82F6; }
+.p-dot-r { background: var(--red); }
+.p-dot-g { background: #10B981; }
+.p-status { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; }
+.p-status-b { color: #3B82F6; }
+.p-status-r { color: var(--red); }
+.p-status-g { color: #10B981; }
+.p-desc { font-size: 14px; color: var(--muted); line-height: 1.6; }
+.p-trigger {
+  margin-top: auto; padding: 14px 16px;
+  background: var(--bg); border: 1px solid var(--bdr); border-radius: 8px;
+  font-size: 13px; font-style: italic; font-weight: 500; color: var(--ink); line-height: 1.45;
 }
-.product-desc { font-size: 14px; color: var(--ink-muted); line-height: 1.55; }
-.product-trigger {
-  margin-top: auto;
-  padding: 14px 16px;
-  background: var(--bg);
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  font-size: 13px; font-weight: 600; color: var(--ink);
-  font-style: italic; line-height: 1.4;
-}
+.p-tags { display: flex; flex-wrap: wrap; gap: 6px; }
 
-/* ── SLIDE 5: CONCORRENTES ───────────────────── */
-#s5 { display: none; }
-#s5.active { display: block; }
-
-.s5-layout {
-  display: grid; grid-template-columns: 1fr 1fr;
-  height: 100%;
-}
-.s5-left {
-  padding: 64px 48px 64px 80px;
-  display: flex; flex-direction: column; justify-content: center;
-  border-right: 1px solid var(--border);
-}
-.s5-right {
-  padding: 64px 80px 64px 48px;
-  display: flex; flex-direction: column; justify-content: center;
-  gap: 12px;
-}
+/* ─── SLIDE 5: CONCORRENTES ────────────────────────────── */
+.comp-list { display: flex; flex-direction: column; gap: 10px; }
 .comp-row {
   display: flex; align-items: center; gap: 14px;
-  padding: 14px 18px;
-  background: var(--surface);
-  border-radius: 10px;
+  padding: 14px 18px; border-radius: 10px;
+  background: var(--surf); border: 1px solid var(--bdr);
 }
-.comp-name { font-size: 14px; font-weight: 700; color: var(--ink); flex: 0 0 120px; }
-.comp-copy { font-size: 13px; color: var(--ink-muted); flex: 1; font-style: italic; }
-.comp-cta { font-size: 11px; font-weight: 600; color: var(--red); white-space: nowrap; }
-.comp-opp {
-  margin-top: 12px;
-  padding: 18px 20px;
-  background: var(--red-tint);
-  border-radius: 10px;
-  border: 1px solid rgba(204,26,26,0.2);
+.comp-name { font-size: 14px; font-weight: 700; flex: 0 0 130px; }
+.comp-copy { font-size: 13px; color: var(--muted); flex: 1; font-style: italic; }
+.comp-note { font-size: 11px; font-weight: 600; color: var(--red); white-space: nowrap; }
+.opp-box {
+  padding: 18px 20px; border-radius: 10px;
+  background: var(--red-t); border: 1px solid rgba(204,26,26,0.2); margin-top: 14px;
 }
-.comp-opp-label {
-  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
-  color: var(--red); margin-bottom: 6px;
-}
-.comp-opp-text { font-size: 14px; font-weight: 500; color: var(--ink); line-height: 1.5; }
+.opp-lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--red); margin-bottom: 6px; }
+.opp-txt { font-size: 15px; font-weight: 500; color: var(--ink); line-height: 1.5; }
 
-/* ── SLIDE 6: V4 METHODOLOGY ────────────────── */
-#s6 { display: none; }
-#s6.active { display: block; }
-
-.s6-layout {
-  display: grid; grid-template-columns: 380px 1fr;
-  height: 100%;
-}
-.s6-left {
-  padding: 64px 48px 64px 80px;
-  display: flex; flex-direction: column; justify-content: center;
-  border-right: 1px solid var(--border);
-}
-.s6-right {
-  padding: 56px 80px 56px 56px;
-  display: flex; flex-direction: column; justify-content: center;
-  gap: 14px;
-}
+/* ─── SLIDE 6: METODOLOGIA V4 ──────────────────────────── */
 .v4-pillar {
   display: flex; gap: 20px; align-items: flex-start;
-  padding: 22px 24px;
-  border-radius: 12px;
-  background: var(--surface);
-  border: 1px solid var(--border);
+  padding: 22px 24px; border-radius: 12px;
+  background: var(--surf); border: 1px solid var(--bdr);
 }
-.v4-num {
-  font-family: var(--font-display);
-  font-size: 40px; font-weight: 700;
-  color: var(--border);
-  line-height: 1; flex-shrink: 0;
-  width: 40px; text-align: center;
+.v4-n {
+  font-family: var(--font-d); font-size: 44px; font-weight: 700;
+  line-height: 1; width: 44px; flex-shrink: 0; text-align: center; color: var(--bdr);
 }
-.v4-pillar.p-aq .v4-num { color: var(--red); }
-.v4-pillar.p-en .v4-num { color: #F59E0B; }
-.v4-pillar.p-mo .v4-num { color: #10B981; }
-.v4-pillar.p-re .v4-num { color: #3B82F6; }
-.v4-pillar-title {
-  font-family: var(--font-display);
-  font-size: 18px; font-weight: 700;
-  text-transform: uppercase; letter-spacing: 0.03em;
-  margin-bottom: 6px; color: var(--ink);
+.p-aq .v4-n { color: var(--red); }
+.p-en .v4-n { color: #F59E0B; }
+.p-mo .v4-n { color: #10B981; }
+.p-re .v4-n { color: #3B82F6; }
+.v4-title {
+  font-family: var(--font-d); font-size: 18px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 6px;
 }
-.v4-pillar-desc { font-size: 13px; color: var(--ink-muted); line-height: 1.55; }
-.v4-arrow {
-  color: var(--ink-muted); font-size: 13px;
-  text-align: center; margin-left: 20px;
-  margin-right: 24px; margin-top: -4px; margin-bottom: -2px;
-  opacity: 0.35;
+.v4-desc { font-size: 13px; color: var(--muted); line-height: 1.55; }
+.v4-arr { text-align: center; color: var(--muted); opacity: 0.3; font-size: 12px; padding: 3px 0 3px 44px; }
+.v4-pillars { display: flex; flex-direction: column; gap: 0; }
+
+.v4-insight {
+  padding: 20px 22px; border-radius: 10px;
+  background: var(--red-t); border: 1px solid rgba(204,26,26,0.2); margin-top: 20px;
 }
 
-/* ── SLIDE 7: AQUISIÇÃO ──────────────────────── */
-#s7 { display: none; }
-#s7.active { display: block; }
-
-.s7-header { padding: 52px 80px 0; }
-.s7-grid {
-  display: grid; grid-template-columns: 1.1fr 1fr;
-  gap: 24px;
-  padding: 28px 80px 60px;
-  height: calc(100% - 140px);
-}
-.s7-left { display: flex; flex-direction: column; gap: 14px; }
-.s7-right { display: flex; flex-direction: column; gap: 14px; }
-
+/* ─── SLIDE 7: AQUISIÇÃO ───────────────────────────────── */
+.acq-grid { display: grid; grid-template-columns: 1.05fr 1fr; gap: 28px; margin-top: 28px; }
+.acq-col { display: flex; flex-direction: column; gap: 16px; }
 .acq-block {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 20px 24px;
+  padding: 20px 24px; border-radius: 10px;
+  background: var(--surf); border: 1px solid var(--bdr);
 }
-.acq-block-title {
-  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
-  color: var(--red); margin-bottom: 10px;
-}
-.acq-block-body { font-size: 14px; color: var(--ink); line-height: 1.55; }
-.acq-block-body strong { font-weight: 700; color: var(--ink); }
+.acq-blk-ttl { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--red); margin-bottom: 10px; }
+.acq-blk-bdy { font-size: 14px; color: var(--ink); line-height: 1.6; }
+.acq-blk-bdy strong { font-weight: 700; }
 
-.hyp-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-.hyp {
-  padding: 14px 14px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: var(--bg);
-  text-align: center;
-}
-.hyp-name { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-muted); margin-bottom: 4px; }
-.hyp-val { font-size: 13px; font-weight: 600; color: var(--ink); }
+.metric-table { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; }
+.metric-row { display: flex; justify-content: space-between; font-size: 13px; gap: 16px; }
+.metric-row .mk { color: var(--muted); }
+.metric-row .mv { font-weight: 700; color: var(--ink); text-align: right; }
+.divider { height: 1px; background: var(--bdr); }
 
-/* ── SLIDE 8: MONETIZAÇÃO ────────────────────── */
-#s8 { display: none; }
-#s8.active { display: block; }
+.wa-box {
+  padding: 18px 20px; border-radius: 10px;
+  background: var(--surf); border: 1px solid var(--bdr);
+  border-left: 4px solid #25D366;
+}
+.wa-lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #25D366; margin-bottom: 8px; }
+.wa-txt { font-size: 14px; color: var(--ink); line-height: 1.55; }
+.wa-txt strong { font-weight: 700; }
 
-.s8-layout {
-  display: grid; grid-template-columns: 440px 1fr;
-  height: 100%;
+/* ─── SLIDE 8: MONETIZAÇÃO ─────────────────────────────── */
+.funnel-col { display: flex; flex-direction: column; gap: 8px; }
+.fnl {
+  display: flex; align-items: center; gap: 14px;
+  padding: 15px 20px; border-radius: 10px;
+  background: var(--surf); border: 1px solid var(--bdr);
 }
-.s8-left {
-  padding: 64px 48px 64px 80px;
-  display: flex; flex-direction: column; justify-content: center;
-  border-right: 1px solid var(--border);
-}
-.s8-right {
-  padding: 64px 80px 64px 48px;
-  display: flex; flex-direction: column; justify-content: center;
-  gap: 10px;
-}
-
-.funnel-row {
-  display: flex; align-items: center; gap: 16px;
-  padding: 16px 20px;
-  background: var(--surface);
-  border-radius: 10px;
-  border: 1px solid var(--border);
-}
-.funnel-icon { font-size: 20px; width: 36px; flex-shrink: 0; }
-.funnel-main { flex: 1; }
-.funnel-label { font-size: 14px; font-weight: 700; color: var(--ink); }
-.funnel-sub { font-size: 12px; color: var(--ink-muted); margin-top: 2px; }
-.funnel-badge {
+.fnl.final { border-color: var(--red); background: var(--red-t); }
+.fnl-ico { font-size: 20px; width: 32px; flex-shrink: 0; }
+.fnl-main { flex: 1; }
+.fnl-lbl { font-size: 14px; font-weight: 700; color: var(--ink); }
+.fnl-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.fnl-badge {
   font-size: 11px; font-weight: 700; color: var(--red);
-  background: var(--red-tint); padding: 3px 10px; border-radius: 100px;
-  white-space: nowrap;
-  font-variant-numeric: tabular-nums;
+  background: var(--red-t); padding: 3px 10px; border-radius: 100px; white-space: nowrap;
 }
-.funnel-arrow { text-align: center; color: var(--ink-muted); opacity: 0.3; font-size: 12px; padding: 2px 0; }
+.fnl-badge.green { color: #10B981; background: rgba(16,185,129,0.08); }
+.fnl-arr { text-align: center; color: var(--muted); opacity: 0.3; font-size: 12px; padding: 1px 0; }
+.wa-channel {
+  margin-top: 14px; padding: 16px 20px; border-radius: 10px;
+  background: var(--surf); border: 1px solid #25D366;
+  display: flex; gap: 14px; align-items: flex-start;
+}
+.wa-ch-icon { font-size: 22px; flex-shrink: 0; }
+.wa-ch-lbl { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #25D366; margin-bottom: 5px; }
+.wa-ch-txt { font-size: 13px; color: var(--ink); line-height: 1.5; }
 
-/* ── SLIDE 9: EXECUÇÃO ───────────────────────── */
-#s9 { display: none; }
-#s9.active { display: block; }
+/* ─── SLIDE 9: QUESTIONAMENTOS ─────────────────────────── */
+.q-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 28px; }
+.q-card {
+  padding: 22px 24px; border-radius: 12px;
+  background: var(--surf); border: 1px solid var(--bdr);
+}
+.q-theme { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--red); margin-bottom: 10px; }
+.q-text { font-size: 15px; font-weight: 500; color: var(--ink); line-height: 1.55; }
+.q-note { font-size: 12px; color: var(--muted); margin-top: 8px; line-height: 1.5; }
 
-.s9-header { padding: 52px 80px 0; }
-.s9-phases {
-  display: flex; flex-direction: column;
-  gap: 16px;
-  padding: 28px 80px 64px;
+/* ─── SLIDE 10: EXECUÇÃO ───────────────────────────────── */
+.phase-list { display: flex; flex-direction: column; gap: 16px; margin-top: 28px; }
+.phase {
+  display: grid; grid-template-columns: 180px 1fr; gap: 24px;
+  padding: 22px 28px; border-radius: 12px;
+  background: var(--surf); border: 1px solid var(--bdr);
+  align-items: start;
 }
-.phase-row {
-  display: grid; grid-template-columns: 180px 1fr;
-  gap: 24px; align-items: start;
-  padding: 22px 28px;
-  background: var(--surface);
-  border-radius: 12px;
-  border: 1px solid var(--border);
-}
-.phase-badge {
-  display: flex; flex-direction: column; gap: 4px;
-}
-.phase-label {
-  font-family: var(--font-display);
-  font-size: 13px; font-weight: 700;
-  text-transform: uppercase; letter-spacing: 0.08em;
-  color: var(--red);
-}
-.phase-period {
-  font-size: 12px; font-weight: 500; color: var(--ink-muted);
-}
-.phase-name {
-  font-family: var(--font-display);
-  font-size: 18px; font-weight: 700;
-  text-transform: uppercase; letter-spacing: 0.02em;
-  color: var(--ink); margin-bottom: 10px;
-}
+.phase.highlight { border-color: var(--red); }
+.phase-lbl { font-family: var(--font-d); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--red); }
+.phase-period { font-size: 12px; font-weight: 500; color: var(--muted); margin-top: 3px; }
+.phase-name { font-family: var(--font-d); font-size: 18px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em; margin-bottom: 10px; }
 .phase-items { display: flex; flex-wrap: wrap; gap: 8px; }
 .phase-item {
-  font-size: 12px; font-weight: 500;
-  color: var(--ink-muted);
-  background: var(--bg);
-  border: 1px solid var(--border);
+  font-size: 12px; font-weight: 500; color: var(--muted);
+  background: var(--bg); border: 1px solid var(--bdr);
   padding: 4px 12px; border-radius: 100px;
 }
 
-/* ── SLIDE 10: PRÓXIMOS PASSOS ───────────────── */
-#s10 {
-  background: var(--ink);
-  display: none;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 64px 80px;
+/* ─── SLIDE 11: PRÓXIMOS PASSOS ────────────────────────── */
+.closing-eyebrow {
+  font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--red); margin-bottom: 14px;
 }
-#s10.active { display: flex; }
-
-.s10-top {
-  display: flex; justify-content: space-between; align-items: center;
+.closing-title {
+  font-family: var(--font-d);
+  font-size: 80px; font-weight: 700; text-transform: uppercase;
+  line-height: 0.92; letter-spacing: 0.01em; color: #FFFFFF;
+  margin-bottom: 44px;
 }
-.s10-logo {
-  font-size: 12px; font-weight: 600; letter-spacing: 0.1em;
-  text-transform: uppercase; color: rgba(255,255,255,0.3);
-  display: flex; gap: 10px;
+.closing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.closing-card {
+  padding: 20px 22px; border-radius: 12px;
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08);
 }
-.s10-logo .client { color: rgba(255,255,255,0.7); }
-.s10-center {
-  flex: 1; display: flex;
-  flex-direction: column; justify-content: center;
-  padding: 32px 0;
+.closing-card.highlight {
+  background: rgba(204,26,26,0.15); border-color: rgba(204,26,26,0.3);
 }
-.s10-eyebrow {
-  font-size: 11px; font-weight: 600; letter-spacing: 0.12em;
-  text-transform: uppercase; color: var(--red); margin-bottom: 16px;
-}
-.s10-title {
-  font-family: var(--font-display);
-  font-size: 64px; font-weight: 700;
-  text-transform: uppercase; line-height: 0.95; letter-spacing: 0.01em;
-  color: white; margin-bottom: 40px;
-}
-.s10-grid {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
-}
-.s10-card {
-  padding: 22px 24px;
-  background: rgba(255,255,255,0.06);
-  border-radius: 12px;
-  border: 1px solid rgba(255,255,255,0.08);
-}
-.s10-card-label {
-  font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
-  text-transform: uppercase; color: rgba(255,255,255,0.35);
-  margin-bottom: 8px;
-}
-.s10-card-val {
-  font-family: var(--font-display);
-  font-size: 18px; font-weight: 700;
-  text-transform: uppercase; color: white;
-  line-height: 1.2;
-}
-.s10-footer {
+.closing-lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.35); margin-bottom: 8px; }
+.closing-lbl.highlight-lbl { color: rgba(255,180,180,0.7); }
+.closing-val { font-family: var(--font-d); font-size: 17px; font-weight: 700; text-transform: uppercase; color: #FFFFFF; line-height: 1.25; }
+.closing-footer {
   border-top: 1px solid rgba(255,255,255,0.07);
-  padding-top: 22px;
+  padding-top: 22px; margin-top: 32px;
   display: flex; justify-content: space-between; align-items: center;
 }
-.s10-cta {
-  font-size: 13px; color: rgba(255,255,255,0.4);
+.closing-cta { font-size: 14px; color: rgba(255,255,255,0.45); line-height: 1.5; }
+.closing-cta strong { color: rgba(255,255,255,0.9); }
+.closing-brand { text-align: right; }
+.closing-brand-name { font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.55); }
+.closing-brand-sub { font-size: 11px; color: rgba(255,255,255,0.25); margin-top: 3px; }
+
+/* ─── RESPONSIVE ──────────────────────────────────────── */
+@media (max-width: 900px) {
+  .pg { padding: 56px 32px; }
+  .two-col { grid-template-columns: 1fr; gap: 40px; }
+  .two-col.left-wide { grid-template-columns: 1fr; }
+  .two-col.right-wide { grid-template-columns: 1fr; }
+  .acq-grid { grid-template-columns: 1fr; }
+  .product-grid { grid-template-columns: 1fr; }
+  .q-grid { grid-template-columns: 1fr; }
+  .closing-grid { grid-template-columns: 1fr 1fr; }
+  .capa-title { font-size: 60px; }
+  .closing-title { font-size: 52px; }
+  .h1 { font-size: 38px; }
 }
-.s10-cta strong { color: white; }
-.s10-contact { text-align: right; }
-.s10-contact-site { font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.6); }
-.s10-contact-tag { font-size: 11px; color: rgba(255,255,255,0.25); margin-top: 2px; }
 </style>
 
-<div class="viewport">
-  <div class="deck" id="deck">
+<!-- NAV -->
+<nav class="topnav" id="topnav">
+  <a href="#s1">Capa</a>
+  <a href="#s2">Mercado</a>
+  <a href="#s3">Diagnóstico</a>
+  <a href="#s4">Produtos</a>
+  <a href="#s5">Concorrentes</a>
+  <a href="#s6">Metodologia V4</a>
+  <a href="#s7">Aquisição</a>
+  <a href="#s8">Monetização</a>
+  <a href="#s9">Questionamentos</a>
+  <a href="#s10">Execução</a>
+  <a href="#s11">Próximos Passos</a>
+</nav>
 
-    <!-- SLIDE 1: CAPA -->
-    <section class="slide" id="s1">
-      <div class="s1-bar">
-        <div class="s1-logos">
-          <span>V4 Company</span>
-          <span class="sep">×</span>
-          <span class="client">Salvou Crédito</span>
-        </div>
-        <div class="s1-badge">Planejamento Estratégico</div>
-      </div>
-      <div class="s1-center">
-        <div class="s1-eyebrow">Agosto 2026</div>
-        <div class="s1-title">
-          ESTRATÉGIA<br>
-          <span class="red">DIGITAL</span><br>
-          CRÉDITO
-        </div>
-        <div class="s1-sub">Meta Ads · Quatro Pilares V4 · Três Produtos<br>Uma operação construída para escalar</div>
-      </div>
-      <div class="s1-footer">
-        <div class="s1-date">Confidencial · Uso exclusivo Salvou Crédito</div>
-      </div>
-    </section>
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  SLIDE 1 · CAPA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<section class="pg dark" id="s1">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:60px;">
+    <div class="capa-logos">
+      <span>V4 Company</span>
+      <span class="sep">×</span>
+      <span class="client">Salvou Crédito</span>
+    </div>
+    <div class="capa-badge">Planejamento Estratégico</div>
+  </div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:20px 0;">
+    <div style="font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--red);margin-bottom:18px;">Agosto 2026</div>
+    <div class="capa-title">
+      ESTRATÉGIA<br>
+      <span class="red">DIGITAL</span><br>
+      CRÉDITO
+    </div>
+    <div class="capa-sub" style="margin-top:20px;">
+      Meta Ads · Quatro Pilares V4 · Três Produtos<br>
+      Uma operação construída para escalar sem depender de canal instável
+    </div>
+  </div>
+  <div class="capa-footer">
+    <div class="capa-date">Confidencial · Uso exclusivo Salvou Crédito</div>
+    <div style="font-size:12px;color:rgba(255,255,255,0.25);">v4company.com.br</div>
+  </div>
+</section>
 
-    <!-- SLIDE 2: MERCADO -->
-    <section class="slide" id="s2">
-      <div class="s2-layout">
-        <div class="s2-left">
-          <div class="eyebrow">Contexto de mercado</div>
-          <div class="redbar"></div>
-          <div class="h1">O mercado de crédito CLT vai <em>triplicar</em> — e o timing é agora</div>
-          <div class="body" style="margin-top: 24px;">
-            Com o Programa Crédito do Trabalhador, trabalhadores CLT têm acesso direto ao consignado sem convênio entre empresa e banco. A regulação criou demanda — quem chegar primeiro com a melhor experiência digital vai liderar.
-          </div>
-        </div>
-        <div class="s2-right">
-          <div class="s2-stat card">
-            <div class="num">R$ 120B</div>
-            <div class="num-label">Potencial da carteira CLT — crescimento projetado de R$ 41B</div>
-          </div>
-          <div class="s2-stat card">
-            <div class="num">50M+</div>
-            <div class="num-label">Trabalhadores CLT no Brasil elegíveis ao consignado</div>
-          </div>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-            <div class="card" style="padding: 20px 24px;">
-              <div style="font-size: 28px; font-weight: 700; color: var(--ink); font-family: var(--font-display);">3.07%</div>
-              <div class="num-label">Taxa média CLT ao mês em 2025</div>
-            </div>
-            <div class="card" style="padding: 20px 24px;">
-              <div style="font-size: 28px; font-weight: 700; color: #22C55E; font-family: var(--font-display);">1.99%</div>
-              <div class="num-label">Com FGTS como garantia (nova regra 2026)</div>
-            </div>
-          </div>
-          <div class="card accent" style="padding: 18px 22px; display: flex; gap: 12px; align-items: flex-start;">
-            <div style="font-size: 20px; flex-shrink: 0; margin-top: 2px;">⚡</div>
-            <div>
-              <div style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--red); margin-bottom: 4px;">Janela regulatória</div>
-              <div style="font-size: 14px; color: var(--ink); line-height: 1.5;">MP 1.292/2025 retirou a barreira do convênio. O consignado privado se tornou acessível a qualquer CLT — a demanda existe, falta quem a capture digitalmente.</div>
-            </div>
-          </div>
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  SLIDE 2 · MERCADO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<section class="pg" id="s2">
+  <div class="two-col left-wide" style="align-items:start;">
+    <div>
+      <div class="eyebrow">Contexto de mercado</div>
+      <div class="redbar"></div>
+      <div class="h1">O mercado de crédito CLT vai <em>triplicar</em> — e o timing é agora</div>
+      <div class="body" style="margin-top:20px;">
+        Com o Programa Crédito do Trabalhador (MP 1.292/2025), trabalhadores CLT têm acesso direto ao consignado sem convênio entre empresa e banco. A regulação criou demanda. Quem chegar primeiro com a melhor experiência digital vai liderar.
+      </div>
+      <div class="alert-box" style="margin-top:24px;">
+        <div class="alert-icon">⚡</div>
+        <div>
+          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--red);margin-bottom:4px;">Janela regulatória</div>
+          <div style="font-size:14px;color:var(--ink);line-height:1.5;">A barreira do convênio foi removida. O consignado privado se tornou acessível a qualquer CLT — a demanda existe, falta quem a capture com experiência digital.</div>
         </div>
       </div>
-    </section>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px;">
+      <div class="card" style="padding:28px 30px;">
+        <div class="num">R$ 120B</div>
+        <div class="num-lbl">Potencial da carteira CLT — crescimento projetado desde R$ 41B</div>
+      </div>
+      <div class="card" style="padding:28px 30px;">
+        <div class="num">50M+</div>
+        <div class="num-lbl">Trabalhadores CLT elegíveis ao consignado no Brasil</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div class="card" style="padding:20px 22px;">
+          <div style="font-size:30px;font-weight:700;font-family:var(--font-d);color:var(--ink);">3.07%</div>
+          <div class="num-lbl">Taxa média CLT/mês em 2025</div>
+        </div>
+        <div class="card" style="padding:20px 22px;">
+          <div style="font-size:30px;font-weight:700;font-family:var(--font-d);color:#10B981;">1.99%</div>
+          <div class="num-lbl">Com FGTS como garantia · nova regra 2026</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-    <!-- SLIDE 3: DIAGNÓSTICO -->
-    <section class="slide" id="s3">
-      <div class="s3-layout">
-        <div class="s3-left">
-          <div class="eyebrow">Diagnóstico</div>
-          <div class="redbar"></div>
-          <div class="h1">O que funcionou, o que travou, <em>o que muda agora</em></div>
-          <div class="body" style="margin-top: 24px;">
-            Dois anos de aprendizado. O negócio valida produto e conversão. O gargalo nunca foi o criativo — foi o canal de fechamento.
-          </div>
-          <div style="margin-top: 28px; display: flex; flex-direction: column; gap: 10px;">
-            <div style="display: flex; align-items: center; gap: 10px;">
-              <div style="width: 8px; height: 8px; border-radius: 50%; background: #22C55E; flex-shrink: 0;"></div>
-              <div style="font-size: 13px; color: var(--ink-muted);">Conversão histórica: <strong style="color:var(--ink);">7% → 10%</strong></div>
-            </div>
-            <div style="display: flex; align-items: center; gap: 10px;">
-              <div style="width: 8px; height: 8px; border-radius: 50%; background: #22C55E; flex-shrink: 0;"></div>
-              <div style="font-size: 13px; color: var(--ink-muted);">Volume de leads: <strong style="color:var(--ink);">200–300/dia</strong></div>
-            </div>
-            <div style="display: flex; align-items: center; gap: 10px;">
-              <div style="width: 8px; height: 8px; border-radius: 50%; background: #22C55E; flex-shrink: 0;"></div>
-              <div style="font-size: 13px; color: var(--ink-muted);">ROAS: <strong style="color:var(--ink);">3x</strong> · CPL: <strong style="color:var(--ink);">R$ 1–3</strong></div>
-            </div>
-          </div>
-        </div>
-        <div class="s3-right">
-          <div class="diag-item bad">
-            <div class="diag-dot"></div>
-            <div>
-              <div class="diag-text-label">Trava principal</div>
-              <div class="diag-text-val">WhatsApp bloqueado repetidamente</div>
-              <div class="diag-text-sub">22 BMs criadas como workaround — escala horizontal insustentável. Operação financeira via WhatsApp também restrita juridicamente.</div>
-            </div>
-          </div>
-          <div class="diag-item bad">
-            <div class="diag-dot"></div>
-            <div>
-              <div class="diag-text-label">Mudança de mercado</div>
-              <div class="diag-text-val">FGTS restringido em novembro/2025</div>
-              <div class="diag-text-sub">Limite reduzido de R$ 10K para R$ 2K. Produto ainda vivo, mas perfil de uso mudou. Pivô necessário para CLT como protagonista.</div>
-            </div>
-          </div>
-          <div class="diag-item good">
-            <div class="diag-dot"></div>
-            <div>
-              <div class="diag-text-label">O que foi construído</div>
-              <div class="diag-text-val">Novo site + fluxo 100% digital</div>
-              <div class="diag-text-sub">Simulador integrado, CPF → análise → aprovação → PIX sem dependência de vendedor. Ferramenta própria integrada ao Meta.</div>
-            </div>
-          </div>
-          <div class="diag-item now">
-            <div class="diag-dot"></div>
-            <div>
-              <div class="diag-text-label">Hipótese central a validar agora</div>
-              <div class="diag-text-val">Taxa de conversão no site vs. WhatsApp</div>
-              <div class="diag-text-sub">Com conversão histórica de 10% no WhatsApp, o site precisa manter ou superar esse número para a operação ser escalável.</div>
-            </div>
-          </div>
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  SLIDE 3 · DIAGNÓSTICO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<section class="pg" id="s3">
+  <div class="two-col left-wide" style="align-items:start;">
+    <div>
+      <div class="eyebrow">Diagnóstico</div>
+      <div class="redbar"></div>
+      <div class="h1">O que funcionou, o que travou, <em>o que muda agora</em></div>
+      <div class="body" style="margin-top:20px;">
+        Dois anos de operação. Produto validado, criativos saudáveis, criatividade na escala horizontal. O gargalo nunca foi o criativo — foi o canal de fechamento.
+      </div>
+      <div style="font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin:24px 0 12px;">Métricas históricas validadas</div>
+      <div class="metrics-strip">
+        <div class="metric-chip"><div class="val">10%</div><div class="lbl">Conversão</div></div>
+        <div class="metric-chip"><div class="val">200–300</div><div class="lbl">Leads/dia</div></div>
+        <div class="metric-chip"><div class="val">3×</div><div class="lbl">ROAS</div></div>
+        <div class="metric-chip"><div class="val">R$1–3</div><div class="lbl">CPL</div></div>
+      </div>
+    </div>
+    <div class="diag-list">
+      <div class="diag-item bad">
+        <div class="diag-dot"></div>
+        <div>
+          <div class="diag-lbl">Trava principal</div>
+          <div class="diag-val">WhatsApp bloqueado repetidamente</div>
+          <div class="diag-sub">Escala horizontal forçada gerou fragmentação de dados — dificultou identificar o que realmente funcionava. Operação financeira via WA também restrita juridicamente.</div>
         </div>
       </div>
-    </section>
+      <div class="diag-item bad">
+        <div class="diag-dot"></div>
+        <div>
+          <div class="diag-lbl">Mudança de mercado</div>
+          <div class="diag-val">FGTS restringido em novembro/2025</div>
+          <div class="diag-sub">Limite reduzido de R$ 10K para R$ 2K. Produto ainda ativo, mas com novo perfil de uso. Pivô necessário para CLT como produto principal.</div>
+        </div>
+      </div>
+      <div class="diag-item ok">
+        <div class="diag-dot"></div>
+        <div>
+          <div class="diag-lbl">O que foi construído</div>
+          <div class="diag-val">Novo site + fluxo 100% digital</div>
+          <div class="diag-sub">Simulador integrado, CPF → análise → aprovação → PIX sem dependência de vendedor. Ferramenta própria integrada ao Meta e CRM.</div>
+        </div>
+      </div>
+      <div class="diag-item now">
+        <div class="diag-dot"></div>
+        <div>
+          <div class="diag-lbl">Hipótese central</div>
+          <div class="diag-val">Taxa de conversão no site ≥ WhatsApp</div>
+          <div class="diag-sub">Com 10% histórico no WhatsApp, a operação no site precisa manter ou superar esse número para ser escalável — e sem o risco de banimento.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-    <!-- SLIDE 4: TRÊS PRODUTOS -->
-    <section class="slide" id="s4">
-      <div class="s4-header">
-        <div class="eyebrow">Portfólio</div>
-        <div class="h2">Três produtos. <em style="font-style:normal; color:var(--red);">Uma operação</em> construída para capturar o cliente em qualquer momento.</div>
-      </div>
-      <div class="s4-products">
-        <div class="product-card p1">
-          <div class="product-icon">💳</div>
-          <div>
-            <div class="product-name">FGTS Antecipação</div>
-            <div class="product-status">
-              <span style="width:8px;height:8px;border-radius:50%;background:#3B82F6;display:inline-block;"></span>
-              <span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:#3B82F6;">Produto vivo · novo perfil</span>
-            </div>
-          </div>
-          <div class="product-desc">Limite reduzido (R$ 2K), mas público ainda ativo. Fácil aprovação, sem restrição de crédito. Funciona como porta de entrada para novos clientes com ticket menor.</div>
-          <div class="product-trigger">
-            "Seu dinheiro já está no FGTS — libere antes, sem burocracia"
-          </div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;">
-            <span class="tag tag-gray">Sem SPC/Serasa</span>
-            <span class="tag tag-gray">PIX em 5 min</span>
-          </div>
-        </div>
-        <div class="product-card p2">
-          <div class="product-icon">📋</div>
-          <div>
-            <div class="product-name">Consignado CLT</div>
-            <div class="product-status">
-              <span style="width:8px;height:8px;border-radius:50%;background:var(--red);display:inline-block;"></span>
-              <span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--red);">Protagonista · maior ticket</span>
-            </div>
-          </div>
-          <div class="product-desc">Mercado em expansão com nova regulação. Desconto em folha, parcelas menores, taxas atrativas. Ticket até R$ 60K. Público: trabalhador CLT que quer crédito com condição justa.</div>
-          <div class="product-trigger">
-            "Você trabalha com carteira assinada — você merece a menor taxa do mercado"
-          </div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;">
-            <span class="tag tag-red">Produto principal</span>
-            <span class="tag tag-gray">100% digital</span>
-          </div>
-        </div>
-        <div class="product-card p3">
-          <div class="product-icon">💚</div>
-          <div>
-            <div class="product-name">Saúde Financeira</div>
-            <div class="product-status">
-              <span style="width:8px;height:8px;border-radius:50%;background:#10B981;display:inline-block;"></span>
-              <span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:#10B981;">Funil de topo · qualificação</span>
-            </div>
-          </div>
-          <div class="product-desc">Lead magnet para qualificar audiência antes de ofertar crédito. Atrai trabalhador curioso, coleta dados, educa sobre possibilidades e prepara o terreno para oferta do consignado.</div>
-          <div class="product-trigger">
-            "Descubra em 2 minutos quanto crédito sua empresa pode liberar para você"
-          </div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;">
-            <span class="tag tag-gray">Topo de funil</span>
-            <span class="tag tag-gray">CPA menor</span>
-          </div>
-        </div>
-      </div>
-    </section>
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  SLIDE 4 · TRÊS PRODUTOS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<section class="pg" id="s4">
+  <div class="eyebrow">Portfólio</div>
+  <div class="h2">Três produtos. <em>Uma operação</em> construída para capturar o cliente em qualquer momento.</div>
+  <div class="product-grid">
 
-    <!-- SLIDE 5: CONCORRENTES -->
-    <section class="slide" id="s5">
-      <div class="s5-layout">
-        <div class="s5-left">
-          <div class="eyebrow">Análise de mercado · Meta Ads Library</div>
-          <div class="redbar"></div>
-          <div class="h1">O mercado é <em>fragmentado</em> — há espaço para liderar em digital</div>
-          <div class="body" style="margin-top: 24px;">
-            Levantamos os anúncios ativos de crédito no Brasil na Biblioteca do Meta. O cenário revela uma oportunidade clara de diferenciação.
-          </div>
-          <div style="margin-top: 28px; display: flex; gap: 20px;">
-            <div class="card" style="flex: 1; padding: 20px; text-align:center;">
-              <div style="font-size: 40px; font-weight: 800; color: var(--red); font-family: var(--font-display); font-variant-numeric: tabular-nums; line-height:1;">34</div>
-              <div class="num-label">Anúncios ativos<br>FGTS no Brasil</div>
-            </div>
-            <div class="card" style="flex: 1; padding: 20px; text-align:center;">
-              <div style="font-size: 40px; font-weight: 800; color: var(--red); font-family: var(--font-display); font-variant-numeric: tabular-nums; line-height:1;">51</div>
-              <div class="num-label">Anúncios ativos<br>CLT no Brasil</div>
-            </div>
-          </div>
-          <div style="margin-top: 16px; font-size: 12px; color: var(--ink-muted);">
-            Dados coletados via Meta Ads Library · Agosto 2026
-          </div>
-        </div>
-        <div class="s5-right">
-          <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-muted); margin-bottom: 4px;">O que o mercado está comunicando</div>
-          <div class="comp-row">
-            <div class="comp-name">Consig</div>
-            <div class="comp-copy">"🚨 Atenção, trabalhador CLT! Crédito consignado liberado para você."</div>
-            <div class="comp-cta">6 ads idênticos</div>
-          </div>
-          <div class="comp-row">
-            <div class="comp-name">Fourcred</div>
-            <div class="comp-copy">"💰 Trabalhador CLT, crédito consignado liberado para você!"</div>
-            <div class="comp-cta">1 ad ativo</div>
-          </div>
-          <div class="comp-row">
-            <div class="comp-name">Capital Cred</div>
-            <div class="comp-copy">"💼 Crédito consignado para trabalhador CLT"</div>
-            <div class="comp-cta">1 ad ativo</div>
-          </div>
-          <div class="comp-row">
-            <div class="comp-name">Nova Conquista</div>
-            <div class="comp-copy">"🟢 Liberte seu Crédito: Simples e Rápido!"</div>
-            <div class="comp-cta">Simulador</div>
-          </div>
-          <div class="comp-row" style="border: 1px solid var(--border);">
-            <div class="comp-name" style="color:var(--red); font-weight:800;">PicPay</div>
-            <div class="comp-copy" style="font-style:normal; font-weight:500;">"Dinheiro para seu momento" — <span style="color:var(--ink-muted); font-style:italic;">branding, não produto</span></div>
-            <div class="comp-cta">Único big player</div>
-          </div>
-          <div class="comp-opp">
-            <div class="comp-opp-label">🎯 Oportunidade identificada</div>
-            <div class="comp-opp-text">Ninguém está construindo narrativa humana. O espaço entre "anúncio de produto" e "marca de propósito" está completamente vazio no crédito digital CLT.</div>
-          </div>
-        </div>
+    <div class="product-card p-blue">
+      <div class="p-icon">💳</div>
+      <div>
+        <div class="p-name">FGTS Antecipação</div>
+        <div class="p-badge"><div class="p-dot p-dot-b"></div><div class="p-status p-status-b">Produto vivo · novo perfil</div></div>
       </div>
-    </section>
+      <div class="p-desc">Limite reduzido (R$ 2K), mas público ainda ativo. Sem restrição de crédito, aprovação fácil. Funciona como porta de entrada com ticket menor e fricção mínima.</div>
+      <div class="p-trigger">"Seu dinheiro já está no FGTS — libere antes, sem burocracia"</div>
+      <div class="p-tags"><span class="tag tag-g">Sem SPC/Serasa</span><span class="tag tag-g">PIX em 5 min</span></div>
+    </div>
 
-    <!-- SLIDE 6: METODOLOGIA V4 -->
-    <section class="slide" id="s6">
-      <div class="s6-layout">
-        <div class="s6-left">
-          <div class="eyebrow">Metodologia V4</div>
-          <div class="redbar"></div>
-          <div class="h1">Quatro pilares. <em>Um sistema</em> que cresce com o negócio.</div>
-          <div class="body" style="margin-top: 24px;">
-            Não é uma campanha. É uma operação de marketing estruturada para gerar resultado recorrente e escalável — cada pilar alimenta o próximo.
-          </div>
-          <div style="margin-top: 32px; padding: 20px 22px; background: var(--red-tint); border-radius: 10px; border: 1px solid rgba(204,26,26,0.2);">
-            <div style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--red); margin-bottom: 8px;">Princípio central</div>
-            <div style="font-size: 14px; color: var(--ink); line-height: 1.55;">Cada real investido em aquisição deve ter um destino claro: uma conversão mensurável e um cliente com potencial de recorrência.</div>
-          </div>
-        </div>
-        <div class="s6-right">
-          <div class="v4-pillar p-aq">
-            <div class="v4-num">01</div>
-            <div>
-              <div class="v4-pillar-title">Aquisição</div>
-              <div class="v4-pillar-desc">Atrair o público certo no Meta com criativos por produto (FGTS, CLT, Saúde Financeira). Estrutura de BM limpa, Advantage+ com liberdade criativa, CPL como sinal — ROAS como norte.</div>
-            </div>
-          </div>
-          <div class="v4-arrow">↓</div>
-          <div class="v4-pillar p-en">
-            <div class="v4-num">02</div>
-            <div>
-              <div class="v4-pillar-title">Engajamento</div>
-              <div class="v4-pillar-desc">Transformar atenção em confiança. Conteúdo educativo sobre crédito CLT, stories de prova social, remarketing para quem simulou e não converteu.</div>
-            </div>
-          </div>
-          <div class="v4-arrow">↓</div>
-          <div class="v4-pillar p-mo">
-            <div class="v4-num">03</div>
-            <div>
-              <div class="v4-pillar-title">Monetização</div>
-              <div class="v4-pillar-desc">Converter simulação em aprovação em PIX. A hipótese principal: manter a conversão de 10% do WhatsApp no fluxo do site — sem vendedor, 100% automatizado.</div>
-            </div>
-          </div>
-          <div class="v4-arrow">↓</div>
-          <div class="v4-pillar p-re">
-            <div class="v4-num">04</div>
-            <div>
-              <div class="v4-pillar-title">Retenção</div>
-              <div class="v4-pillar-desc">Transformar cliente em recorrente. Remarketing para quem já contratou, oferta de produto complementar (FGTS + CLT), LTV como métrica de crescimento sustentável.</div>
-            </div>
-          </div>
-        </div>
+    <div class="product-card p-red">
+      <div class="p-icon">📋</div>
+      <div>
+        <div class="p-name">Consignado CLT</div>
+        <div class="p-badge"><div class="p-dot p-dot-r"></div><div class="p-status p-status-r">Protagonista · maior ticket</div></div>
       </div>
-    </section>
+      <div class="p-desc">Mercado em expansão com nova regulação. Desconto em folha, parcelas menores, taxas atrativas. Ticket até R$ 60K. Público: trabalhador CLT que quer crédito com condição justa.</div>
+      <div class="p-trigger">"Você trabalha com carteira assinada — você merece a menor taxa do mercado"</div>
+      <div class="p-tags"><span class="tag tag-r">Produto principal</span><span class="tag tag-g">100% digital</span></div>
+    </div>
 
-    <!-- SLIDE 7: AQUISIÇÃO -->
-    <section class="slide" id="s7">
-      <div class="s7-header">
-        <div class="eyebrow">Pilar 01 · Aquisição</div>
-        <div class="h2">Meta Ads com inteligência — não com <em style="font-style:normal;color:var(--red);">volume de contas</em></div>
+    <div class="product-card p-green">
+      <div class="p-icon">💚</div>
+      <div>
+        <div class="p-name">Saúde Financeira</div>
+        <div class="p-badge"><div class="p-dot p-dot-g"></div><div class="p-status p-status-g">Funil de topo · qualificação</div></div>
       </div>
-      <div class="s7-grid">
-        <div class="s7-left">
-          <div class="acq-block">
-            <div class="acq-block-title">Estrutura de BM</div>
-            <div class="acq-block-body">
-              Consolidar em <strong>1–2 BMs limpas</strong> com histórico saudável. 22 BMs fragmentadas diluem o aprendizado do algoritmo e dificultam a identificação do que funciona. Dados concentrados = otimização mais rápida.
-            </div>
-          </div>
-          <div class="acq-block">
-            <div class="acq-block-title">Advantage+ Shopping / Broad</div>
-            <div class="acq-block-body">
-              Deixar o Meta otimizar com variedade criativa — não segmentar manualmente. O algoritmo pós-Advantage já supera a segmentação manual em nichos financeiros. <strong>Criativo é a segmentação.</strong>
-            </div>
-          </div>
-          <div class="acq-block">
-            <div class="acq-block-title">Criativo por produto</div>
-            <div class="acq-block-body">
-              <strong>FGTS:</strong> urgência + dinheiro já disponível.<br>
-              <strong>CLT:</strong> benefício, não produto — "você merece".<br>
-              <strong>Saúde Financeira:</strong> curiosidade + valor gratuito.<br>
-              Formatos: vídeo curto (9:16), carrossel, estático.
-            </div>
-          </div>
-        </div>
-        <div class="s7-right">
-          <div class="acq-block">
-            <div class="acq-block-title">As 3 hipóteses de conversão</div>
-            <div class="hyp-grid" style="margin-top: 8px;">
-              <div class="hyp">
-                <div class="hyp-name">H1 · Site</div>
-                <div class="hyp-val">100% self-service</div>
-              </div>
-              <div class="hyp">
-                <div class="hyp-name">H2 · WhatsApp</div>
-                <div class="hyp-val">Validação de fluxo</div>
-              </div>
-              <div class="hyp">
-                <div class="hyp-name">H3 · Híbrido</div>
-                <div class="hyp-val">WA + link site</div>
-              </div>
-            </div>
-          </div>
-          <div class="acq-block">
-            <div class="acq-block-title">Métricas que importam</div>
-            <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 8px;">
-              <div style="display: flex; justify-content: space-between; font-size: 13px;">
-                <span style="color: var(--ink-muted);">ROAS</span>
-                <span style="font-weight: 700; color: var(--ink);">Norte principal · meta: superar 3x histórico</span>
-              </div>
-              <div style="height: 1px; background: var(--border);"></div>
-              <div style="display: flex; justify-content: space-between; font-size: 13px;">
-                <span style="color: var(--ink-muted);">CPL</span>
-                <span style="font-weight: 700; color: var(--ink);">Sinal · R$ 1–3 como referência inicial</span>
-              </div>
-              <div style="height: 1px; background: var(--border);"></div>
-              <div style="display: flex; justify-content: space-between; font-size: 13px;">
-                <span style="color: var(--ink-muted);">Taxa de conversão</span>
-                <span style="font-weight: 700; color: var(--ink);">Benchmark: 10% (WhatsApp histórico)</span>
-              </div>
-              <div style="height: 1px; background: var(--border);"></div>
-              <div style="display: flex; justify-content: space-between; font-size: 13px;">
-                <span style="color: var(--ink-muted);">CTR criativo</span>
-                <span style="font-weight: 700; color: var(--ink);">Identifica narrativa vencedora por produto</span>
-              </div>
-            </div>
-          </div>
-          <div class="acq-block card accent" style="background: var(--red-tint); border-color: rgba(204,26,26,0.25);">
-            <div class="acq-block-title">Aprendizado do mercado</div>
-            <div style="font-size: 14px; color: var(--ink); line-height: 1.55;">
-              <strong>Lead barato não é melhor.</strong> A Salvou Crédito já aprendeu que R$ 3 por link de conversão supera R$ 1 por lead frio. Esse aprendizado guia toda a estratégia criativa.
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+      <div class="p-desc">Lead magnet que qualifica a audiência antes de ofertar crédito. Atrai trabalhador curioso, coleta dados relevantes, educa sobre possibilidades e aquece o lead para o consignado.</div>
+      <div class="p-trigger">"Descubra em 2 minutos quanto crédito sua empresa pode liberar para você"</div>
+      <div class="p-tags"><span class="tag tag-g">Topo de funil</span><span class="tag tag-g">CPA menor</span></div>
+    </div>
 
-    <!-- SLIDE 8: MONETIZAÇÃO -->
-    <section class="slide" id="s8">
-      <div class="s8-layout">
-        <div class="s8-left">
-          <div class="eyebrow">Pilar 03 · Monetização</div>
-          <div class="redbar"></div>
-          <div class="h1">A hipótese: converter <em>sem vendedor</em></div>
-          <div class="body" style="margin-top: 24px;">
-            Fluxo 100% digital — do clique ao PIX sem intervenção humana. A validação desse funil é o primeiro marco crítico da operação.
-          </div>
-          <div style="margin-top: 28px; display: flex; flex-direction: column; gap: 12px;">
-            <div style="padding: 16px 20px; background: var(--surface); border-radius: 10px; border: 1px solid var(--border);">
-              <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-muted); margin-bottom: 6px;">Saúde Financeira como pré-funil</div>
-              <div style="font-size: 14px; color: var(--ink); line-height: 1.5;">Qualifica o lead antes de oferecer crédito. Reduz atrito, aumenta intenção e melhora a conversão downstream.</div>
-            </div>
-            <div style="padding: 16px 20px; background: var(--red-tint); border-radius: 10px; border: 1px solid rgba(204,26,26,0.2);">
-              <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--red); margin-bottom: 6px;">Benchmark interno</div>
-              <div style="font-size: 14px; color: var(--ink); font-weight: 600;">10% de conversão no WhatsApp → meta a manter ou superar no site</div>
-            </div>
-          </div>
-        </div>
-        <div class="s8-right">
-          <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-muted); margin-bottom: 8px;">Funil de conversão · Hipótese H1 (Site)</div>
-          <div class="funnel-row">
-            <div class="funnel-icon">🎯</div>
-            <div class="funnel-main">
-              <div class="funnel-label">Criativo Meta</div>
-              <div class="funnel-sub">Vídeo ou carrossel segmentado por produto</div>
-            </div>
-            <div class="funnel-badge">Topo</div>
-          </div>
-          <div class="funnel-arrow">↓</div>
-          <div class="funnel-row">
-            <div class="funnel-icon">🖥️</div>
-            <div class="funnel-main">
-              <div class="funnel-label">Simulador no site</div>
-              <div class="funnel-sub">Valor desejado + dados básicos</div>
-            </div>
-            <div class="funnel-badge">Engajamento</div>
-          </div>
-          <div class="funnel-arrow">↓</div>
-          <div class="funnel-row">
-            <div class="funnel-icon">🔍</div>
-            <div class="funnel-main">
-              <div class="funnel-label">Análise de CPF</div>
-              <div class="funnel-sub">Elegibilidade verificada em tempo real</div>
-            </div>
-            <div class="funnel-badge">Qualificação</div>
-          </div>
-          <div class="funnel-arrow">↓</div>
-          <div class="funnel-row" style="border-color: #10B981; background: rgba(16,185,129,0.06);">
-            <div class="funnel-icon">✅</div>
-            <div class="funnel-main">
-              <div class="funnel-label">Aprovação + Assinatura digital</div>
-              <div class="funnel-sub">Sem papel, sem banco físico</div>
-            </div>
-            <div class="funnel-badge" style="background: rgba(16,185,129,0.1); color: #10B981;">Conversão</div>
-          </div>
-          <div class="funnel-arrow">↓</div>
-          <div class="funnel-row" style="border-color: var(--red);">
-            <div class="funnel-icon">⚡</div>
-            <div class="funnel-main">
-              <div class="funnel-label">PIX em até 5 minutos</div>
-              <div class="funnel-sub">Zero interação humana necessária</div>
-            </div>
-            <div class="funnel-badge">Resultado</div>
-          </div>
-        </div>
-      </div>
-    </section>
+  </div>
+</section>
 
-    <!-- SLIDE 9: EXECUÇÃO -->
-    <section class="slide" id="s9">
-      <div class="s9-header">
-        <div class="eyebrow">Plano de execução</div>
-        <div class="h2">Três fases. <em style="font-style:normal;color:var(--red);">Dados a cada passo.</em></div>
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  SLIDE 5 · CONCORRENTES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<section class="pg" id="s5">
+  <div class="two-col left-wide" style="align-items:start;">
+    <div>
+      <div class="eyebrow">Análise · Meta Ads Library</div>
+      <div class="redbar"></div>
+      <div class="h1">O mercado é <em>fragmentado</em> — há espaço para liderar em digital</div>
+      <div class="body" style="margin-top:20px;">
+        Levantamos os anúncios ativos de crédito no Brasil na Biblioteca do Meta. O cenário é de fragmentação: maioria são correspondentes locais com messaging genérico e sem consistência de marca.
       </div>
-      <div class="s9-phases">
-        <div class="phase-row">
-          <div class="phase-badge">
-            <div class="phase-label">Fase 01</div>
-            <div class="phase-period">Semanas 1–2</div>
-          </div>
-          <div>
-            <div class="phase-name">Estruturar</div>
-            <div class="phase-items">
-              <span class="phase-item">BM limpa configurada</span>
-              <span class="phase-item">Pixel + eventos de conversão</span>
-              <span class="phase-item">Criativos iniciais por produto (FGTS, CLT, Saúde)</span>
-              <span class="phase-item">3 hipóteses de conversão live</span>
-              <span class="phase-item">Integração ferramenta interna</span>
-              <span class="phase-item">Dashboard de acompanhamento</span>
-            </div>
-          </div>
-        </div>
-        <div class="phase-row">
-          <div class="phase-badge">
-            <div class="phase-label">Fase 02</div>
-            <div class="phase-period">Semanas 3–6</div>
-          </div>
-          <div>
-            <div class="phase-name">Aprender</div>
-            <div class="phase-items">
-              <span class="phase-item">Identificar hipótese vencedora (site vs WA vs híbrido)</span>
-              <span class="phase-item">Criativo campeão por produto</span>
-              <span class="phase-item">Otimização de CPL e taxa de conversão</span>
-              <span class="phase-item">Segmentos de remarketing ativos</span>
-              <span class="phase-item">Análise de ROAS por produto</span>
-            </div>
-          </div>
-        </div>
-        <div class="phase-row" style="border-color: var(--red);">
-          <div class="phase-badge">
-            <div class="phase-label" style="color: #10B981;">Fase 03</div>
-            <div class="phase-period">Semana 7+</div>
-          </div>
-          <div>
-            <div class="phase-name" style="color: var(--ink);">Escalar</div>
-            <div class="phase-items">
-              <span class="phase-item">Dobrar investimento no produto com melhor ROAS</span>
-              <span class="phase-item">Advantage+ em escala com múltiplos criativos</span>
-              <span class="phase-item">Ativar pilar de retenção (remarketing CLT → FGTS e vice-versa)</span>
-              <span class="phase-item">Testes de novos formatos (UGC, depoimento real)</span>
-              <span class="phase-item">Relatório mensal com decisões baseadas em dados</span>
-            </div>
-          </div>
+      <div class="card" style="margin-top:24px;padding:22px 24px;">
+        <div style="font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px;">Padrão dominante do mercado</div>
+        <div style="font-size:17px;font-style:italic;color:var(--ink);line-height:1.5;">"🚨 Atenção, trabalhador CLT! Crédito consignado liberado para você."</div>
+        <div style="font-size:13px;color:var(--muted);margin-top:8px;">Mesma mensagem, diferentes players — ninguém está se diferenciando.</div>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:10px;">Referências encontradas na biblioteca</div>
+      <div class="comp-list">
+        <div class="comp-row"><div class="comp-name">Consig</div><div class="comp-copy">"Atenção, trabalhador CLT! Crédito consignado liberado para você."</div><div class="comp-note">Escala horizontal</div></div>
+        <div class="comp-row"><div class="comp-name">Fourcred Solufin</div><div class="comp-copy">"Trabalhador CLT, crédito consignado liberado para você!"</div><div class="comp-note">Genérico</div></div>
+        <div class="comp-row"><div class="comp-name">Capital Cred</div><div class="comp-copy">"Crédito consignado para trabalhador CLT"</div><div class="comp-note">Produto, sem pessoa</div></div>
+        <div class="comp-row"><div class="comp-name">Nova Conquista</div><div class="comp-copy">"Liberte seu Crédito: Simples e Rápido!"</div><div class="comp-note">Simulador</div></div>
+        <div class="comp-row" style="border:1px solid var(--bdr);">
+          <div class="comp-name" style="color:var(--red);font-weight:800;">PicPay</div>
+          <div class="comp-copy" style="font-style:normal;font-weight:500;">"Dinheiro para seu momento" — branding, não produto</div>
+          <div class="comp-note">Único big player</div>
         </div>
       </div>
-    </section>
+      <div class="opp-box">
+        <div class="opp-lbl">🎯 Oportunidade identificada</div>
+        <div class="opp-txt">Ninguém está construindo narrativa humana no crédito CLT. O espaço entre "anúncio de produto" e "marca com propósito" está completamente vazio.</div>
+      </div>
+    </div>
+  </div>
+</section>
 
-    <!-- SLIDE 10: PRÓXIMOS PASSOS -->
-    <section class="slide" id="s10">
-      <div class="s10-top">
-        <div class="s10-logo">
-          <span>V4 Company</span>
-          <span style="color:rgba(255,255,255,0.15);">×</span>
-          <span class="client">Salvou Crédito</span>
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  SLIDE 6 · METODOLOGIA V4
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<section class="pg" id="s6">
+  <div class="two-col left-wide" style="align-items:start;">
+    <div>
+      <div class="eyebrow">Metodologia V4</div>
+      <div class="redbar"></div>
+      <div class="h1">Quatro pilares. <em>Um sistema</em> que cresce com o negócio.</div>
+      <div class="body" style="margin-top:20px;">
+        Não é uma campanha isolada. É uma operação de marketing onde cada pilar alimenta o próximo — aquisição gera tráfego qualificado, engajamento constrói confiança, monetização converte e retenção multiplica o LTV.
+      </div>
+      <div class="v4-insight">
+        <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--red);margin-bottom:8px;">Princípio central</div>
+        <div style="font-size:14px;color:var(--ink);line-height:1.6;">Cada real investido em aquisição deve ter um destino claro: uma conversão mensurável e um cliente com potencial de recorrência.</div>
+      </div>
+    </div>
+    <div class="v4-pillars">
+      <div class="v4-pillar p-aq">
+        <div class="v4-n">01</div>
+        <div>
+          <div class="v4-title">Aquisição</div>
+          <div class="v4-desc">Atrair o público certo no Meta com criativos por produto. Estrutura de BM limpa, Advantage+ com liberdade criativa. CPL como sinal — ROAS e conversão como norte.</div>
         </div>
       </div>
-      <div class="s10-center">
-        <div class="s10-eyebrow">Próximos passos</div>
-        <div class="s10-title">
-          COMEÇA<br>
-          SEGUNDA
-        </div>
-        <div class="s10-grid">
-          <div class="s10-card">
-            <div class="s10-card-label">Escopo</div>
-            <div class="s10-card-val">Estratégia + Gestão Meta Ads · 3 produtos</div>
-          </div>
-          <div class="s10-card">
-            <div class="s10-card-label">O que entregamos</div>
-            <div class="s10-card-val">Estrutura · Criativos · Otimização · Relatório semanal</div>
-          </div>
-          <div class="s10-card" style="border-color: rgba(204,26,26,0.3); background: rgba(204,26,26,0.1);">
-            <div class="s10-card-label" style="color: rgba(255,180,180,0.7);">Investimento</div>
-            <div class="s10-card-val" style="color: white;">A apresentar ao final</div>
-          </div>
-          <div class="s10-card">
-            <div class="s10-card-label">Primeiro dado</div>
-            <div class="s10-card-val">72 horas após o kick-off técnico</div>
-          </div>
-          <div class="s10-card">
-            <div class="s10-card-label">Kick-off técnico</div>
-            <div class="s10-card-val">Alinhar BM + pixel + acesso + criativos</div>
-          </div>
-          <div class="s10-card">
-            <div class="s10-card-label">Frequência de reporte</div>
-            <div class="s10-card-val">Semanal com decisões baseadas em dados</div>
-          </div>
+      <div class="v4-arr">↓</div>
+      <div class="v4-pillar p-en">
+        <div class="v4-n">02</div>
+        <div>
+          <div class="v4-title">Engajamento</div>
+          <div class="v4-desc">Transformar atenção em confiança. Conteúdo educativo sobre crédito CLT, prova social, remarketing para quem simulou mas ainda não converteu.</div>
         </div>
       </div>
-      <div class="s10-footer">
-        <div class="s10-cta">
-          O próximo passo é <strong>um kick-off técnico</strong> para alinhar BM, acessos e criativos iniciais.
-        </div>
-        <div class="s10-contact">
-          <div class="s10-contact-site">v4company.com.br</div>
-          <div class="s10-contact-tag">Agosto 2026 · Confidencial</div>
+      <div class="v4-arr">↓</div>
+      <div class="v4-pillar p-mo">
+        <div class="v4-n">03</div>
+        <div>
+          <div class="v4-title">Monetização</div>
+          <div class="v4-desc">Converter simulação em aprovação em PIX. A hipótese central: manter conversão de 10% do WhatsApp no fluxo digital do site — sem vendedor, 100% automatizado.</div>
         </div>
       </div>
-    </section>
+      <div class="v4-arr">↓</div>
+      <div class="v4-pillar p-re">
+        <div class="v4-n">04</div>
+        <div>
+          <div class="v4-title">Retenção</div>
+          <div class="v4-desc">Transformar cliente em recorrente. Remarketing pós-contratação, oferta de produto complementar (FGTS + CLT), LTV como métrica de crescimento sustentável.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-  </div><!-- /deck -->
-</div><!-- /viewport -->
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  SLIDE 7 · AQUISIÇÃO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<section class="pg" id="s7">
+  <div class="eyebrow">Pilar 01 · Aquisição</div>
+  <div class="h2">Meta Ads com inteligência — não com <em>volume de contas</em></div>
+  <div class="acq-grid">
+    <div class="acq-col">
+      <div class="acq-block">
+        <div class="acq-blk-ttl">Estrutura de BM</div>
+        <div class="acq-blk-bdy">Consolidar em <strong>1–2 BMs limpas</strong> com histórico saudável. BMs fragmentadas diluem o aprendizado do algoritmo. Dados concentrados = otimização mais rápida e decisões mais claras.</div>
+      </div>
+      <div class="acq-block">
+        <div class="acq-blk-ttl">Advantage+ / Broad</div>
+        <div class="acq-blk-bdy">Deixar o Meta otimizar com variedade criativa — não segmentar manualmente. Pós-Advantage, o algoritmo supera segmentação manual em nichos financeiros. <strong>Criativo é a segmentação.</strong></div>
+      </div>
+      <div class="acq-block">
+        <div class="acq-blk-ttl">Criativo por produto</div>
+        <div class="acq-blk-bdy">
+          <strong>FGTS:</strong> urgência + dinheiro já disponível<br>
+          <strong>CLT:</strong> benefício, não produto — "você merece"<br>
+          <strong>Saúde Financeira:</strong> curiosidade + valor gratuito<br>
+          Formatos: vídeo 9:16, carrossel, estático
+        </div>
+      </div>
+      <div class="wa-box">
+        <div class="wa-lbl">📱 WhatsApp · Suporte estratégico com IA</div>
+        <div class="wa-txt">Canal de suporte — não de fechamento. Uma <strong>IA responde dúvidas, contorna objeções</strong> e sempre devolve o usuário ao site para concluir a contratação. Reduz atrito sem depender do canal para conversão.</div>
+      </div>
+    </div>
+    <div class="acq-col">
+      <div class="acq-block">
+        <div class="acq-blk-ttl">Métricas que orientam a operação</div>
+        <div class="metric-table">
+          <div class="metric-row"><span class="mk">ROAS</span><span class="mv">Norte principal · meta: superar 3× histórico</span></div>
+          <div class="divider"></div>
+          <div class="metric-row"><span class="mk">CPL</span><span class="mv">Sinal · R$ 1–3 como referência inicial</span></div>
+          <div class="divider"></div>
+          <div class="metric-row"><span class="mk">Taxa de conversão</span><span class="mv">Benchmark: 10% (WhatsApp histórico)</span></div>
+          <div class="divider"></div>
+          <div class="metric-row"><span class="mk">CTR criativo</span><span class="mv">Identifica narrativa vencedora por produto</span></div>
+        </div>
+      </div>
+      <div class="acq-block card accent">
+        <div class="acq-blk-ttl">Aprendizado validado</div>
+        <div style="font-size:15px;color:var(--ink);line-height:1.6;font-weight:500;">"<strong>Lead barato não é melhor.</strong> R$ 3 por link de conversão supera R$ 1 por lead frio." Este aprendizado guia toda a estratégia criativa — qualidade sobre volume.</div>
+      </div>
+      <div class="acq-block">
+        <div class="acq-blk-ttl">Hipóteses de conversão a validar</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px;">
+          <div style="padding:14px;border-radius:8px;background:var(--bg);border:1px solid var(--bdr);text-align:center;">
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:4px;">H1 · Primária</div>
+            <div style="font-size:13px;font-weight:700;color:var(--red);">Site 100%<br>self-service</div>
+          </div>
+          <div style="padding:14px;border-radius:8px;background:var(--bg);border:1px solid var(--bdr);text-align:center;">
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:4px;">H2 · Suporte</div>
+            <div style="font-size:13px;font-weight:700;color:var(--ink);">WA IA → site<br>híbrido</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-<!-- Navigation -->
-<div class="nav-dots" id="navDots"></div>
-<div class="slide-num" id="slideNum"></div>
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  SLIDE 8 · MONETIZAÇÃO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<section class="pg" id="s8">
+  <div class="two-col left-wide" style="align-items:start;">
+    <div>
+      <div class="eyebrow">Pilar 03 · Monetização</div>
+      <div class="redbar"></div>
+      <div class="h1">A hipótese: converter <em>sem vendedor</em></div>
+      <div class="body" style="margin-top:20px;">
+        Fluxo 100% digital — do clique ao PIX sem intervenção humana. Validar essa taxa de conversão é o primeiro marco crítico da operação.
+      </div>
+      <div style="margin-top:24px;display:flex;flex-direction:column;gap:14px;">
+        <div class="card" style="padding:20px 22px;">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:8px;">Saúde Financeira como pré-funil</div>
+          <div style="font-size:14px;color:var(--ink);line-height:1.55;">Qualifica o lead antes de ofertar crédito. Reduz atrito, aumenta intenção e melhora a taxa de conversão downstream — lead mais quente, custo menor.</div>
+        </div>
+        <div class="card accent" style="padding:20px 22px;">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--red);margin-bottom:8px;">Benchmark interno</div>
+          <div style="font-size:16px;font-weight:700;color:var(--ink);">10% no WhatsApp → meta a igualar ou superar no site</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:10px;">Funil principal · Site (Hipótese H1)</div>
+      <div class="funnel-col">
+        <div class="fnl"><div class="fnl-ico">🎯</div><div class="fnl-main"><div class="fnl-lbl">Criativo Meta</div><div class="fnl-sub">Vídeo ou carrossel segmentado por produto</div></div><div class="fnl-badge">Topo</div></div>
+        <div class="fnl-arr">↓</div>
+        <div class="fnl"><div class="fnl-ico">🖥️</div><div class="fnl-main"><div class="fnl-lbl">Simulador no site</div><div class="fnl-sub">Valor desejado + dados básicos</div></div><div class="fnl-badge">Engajamento</div></div>
+        <div class="fnl-arr">↓</div>
+        <div class="fnl"><div class="fnl-ico">🔍</div><div class="fnl-main"><div class="fnl-lbl">Análise de CPF</div><div class="fnl-sub">Elegibilidade verificada em tempo real</div></div><div class="fnl-badge">Qualificação</div></div>
+        <div class="fnl-arr">↓</div>
+        <div class="fnl"><div class="fnl-ico">✅</div><div class="fnl-main"><div class="fnl-lbl">Aprovação + Assinatura digital</div><div class="fnl-sub">Sem papel, sem banco físico</div></div><div class="fnl-badge green">Conversão</div></div>
+        <div class="fnl-arr">↓</div>
+        <div class="fnl final"><div class="fnl-ico">⚡</div><div class="fnl-main"><div class="fnl-lbl">PIX em até 5 minutos</div><div class="fnl-sub">Zero interação humana necessária</div></div><div class="fnl-badge">Resultado</div></div>
+      </div>
+      <div class="wa-channel">
+        <div class="wa-ch-icon">📱</div>
+        <div>
+          <div class="wa-ch-lbl">WhatsApp IA · Suporte paralelo</div>
+          <div class="wa-ch-txt">Para quem tem dúvida antes de clicar ou travou em algum passo. A IA responde objeções e redireciona ao site — sempre com o objetivo de completar a contratação no fluxo principal.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  SLIDE 9 · QUESTIONAMENTOS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<section class="pg" id="s9">
+  <div class="eyebrow">Antes de executar</div>
+  <div class="h2">Seis questões que precisamos <em>responder juntos</em></div>
+  <div class="body" style="margin-top:12px;max-width:720px;">
+    Para que a estratégia funcione desde o início, precisamos alinhar esses pontos antes de subir a primeira campanha. Cada resposta impacta diretamente o cronograma e a qualidade dos dados.
+  </div>
+  <div class="q-grid">
+    <div class="q-card">
+      <div class="q-theme">Integração técnica</div>
+      <div class="q-text">A ferramenta interna já está preparada para receber eventos de conversão do site (simulação, aprovação, PIX)?</div>
+      <div class="q-note">Impacta a qualidade dos dados de otimização e a velocidade de aprendizado do algoritmo.</div>
+    </div>
+    <div class="q-card">
+      <div class="q-theme">Critério de validação</div>
+      <div class="q-text">Como definimos que a Hipótese H1 (site) foi validada? Qual taxa de conversão mínima e em quantos dias?</div>
+      <div class="q-note">Sem critério claro, corremos o risco de otimizar prematuramente ou insistir num caminho que não funciona.</div>
+    </div>
+    <div class="q-card">
+      <div class="q-theme">Criativos iniciais</div>
+      <div class="q-text">Já temos materiais (vídeos, imagens, depoimentos) para partir do zero ou vamos produzir juntos antes do kick-off?</div>
+      <div class="q-note">Define o prazo real da Fase 1. Com assets prontos, a primeira semana já gera dados.</div>
+    </div>
+    <div class="q-card">
+      <div class="q-theme">Acesso e governance</div>
+      <div class="q-text">Quem tem acesso às BMs, pixel e conta de anúncios? Como será o processo de aprovação de criativos?</div>
+      <div class="q-note">Sem acesso configurado antes do kick-off, atrasamos a Fase 1 em pelo menos uma semana.</div>
+    </div>
+    <div class="q-card">
+      <div class="q-theme">WhatsApp IA</div>
+      <div class="q-text">O fluxo de IA para suporte já existe ou é parte do escopo a construir? Quem mantém a base de conhecimento?</div>
+      <div class="q-note">A eficácia do suporte depende de uma base de objeções bem mapeada — esse processo precisa começar agora.</div>
+    </div>
+    <div class="q-card">
+      <div class="q-theme">Definição de sucesso</div>
+      <div class="q-text">O que define um primeiro mês bem-sucedido para os dois lados? Qual é a expectativa de ROAS e volume de contratos?</div>
+      <div class="q-note">Alinhamento de expectativa é o que separa uma parceria sustentável de uma frustração mútua.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  SLIDE 10 · EXECUÇÃO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<section class="pg" id="s10">
+  <div class="eyebrow">Plano de execução</div>
+  <div class="h2">Três fases. <em>Dados a cada passo.</em></div>
+  <div class="phase-list">
+    <div class="phase">
+      <div>
+        <div class="phase-lbl">Fase 01</div>
+        <div class="phase-period">Semanas 1–2</div>
+      </div>
+      <div>
+        <div class="phase-name">Estruturar</div>
+        <div class="phase-items">
+          <span class="phase-item">BM limpa configurada</span>
+          <span class="phase-item">Pixel + eventos de conversão</span>
+          <span class="phase-item">Criativos iniciais por produto (FGTS, CLT, Saúde)</span>
+          <span class="phase-item">Hipóteses H1 e H2 live simultaneamente</span>
+          <span class="phase-item">Base de conhecimento WA IA mapeada</span>
+          <span class="phase-item">Dashboard de acompanhamento semanal</span>
+        </div>
+      </div>
+    </div>
+    <div class="phase">
+      <div>
+        <div class="phase-lbl">Fase 02</div>
+        <div class="phase-period">Semanas 3–6</div>
+      </div>
+      <div>
+        <div class="phase-name">Aprender</div>
+        <div class="phase-items">
+          <span class="phase-item">Identificar hipótese vencedora (H1 vs H2)</span>
+          <span class="phase-item">Criativo campeão por produto</span>
+          <span class="phase-item">Otimização de CPL e taxa de conversão</span>
+          <span class="phase-item">Segmentos de remarketing ativos</span>
+          <span class="phase-item">Análise de ROAS por produto</span>
+          <span class="phase-item">Refinamento do fluxo WA IA</span>
+        </div>
+      </div>
+    </div>
+    <div class="phase highlight">
+      <div>
+        <div class="phase-lbl" style="color:#10B981;">Fase 03</div>
+        <div class="phase-period">Semana 7+</div>
+      </div>
+      <div>
+        <div class="phase-name">Escalar</div>
+        <div class="phase-items">
+          <span class="phase-item">Dobrar investimento no produto com melhor ROAS</span>
+          <span class="phase-item">Advantage+ com múltiplos criativos em rotação</span>
+          <span class="phase-item">Ativar pilar de retenção (CLT → FGTS e vice-versa)</span>
+          <span class="phase-item">Testes de UGC e depoimentos reais</span>
+          <span class="phase-item">Relatório mensal com decisões baseadas em dados</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  SLIDE 11 · PRÓXIMOS PASSOS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<section class="pg dark" id="s11">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:48px;">
+    <div style="display:flex;gap:10px;font-size:12px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.3);">
+      <span>V4 Company</span><span style="color:rgba(255,255,255,0.12);">×</span><span style="color:rgba(255,255,255,0.7);">Salvou Crédito</span>
+    </div>
+  </div>
+  <div>
+    <div class="closing-eyebrow">Próximos passos</div>
+    <div class="closing-title">
+      COMEÇA<br>SEGUNDA
+    </div>
+    <div class="closing-grid">
+      <div class="closing-card">
+        <div class="closing-lbl">Escopo</div>
+        <div class="closing-val">Estratégia + Gestão Meta Ads · 3 Produtos</div>
+      </div>
+      <div class="closing-card">
+        <div class="closing-lbl">O que entregamos</div>
+        <div class="closing-val">Estrutura · Criativos · Otimização · Relatório semanal</div>
+      </div>
+      <div class="closing-card highlight">
+        <div class="closing-lbl highlight-lbl">Investimento</div>
+        <div class="closing-val">A apresentar ao final desta reunião</div>
+      </div>
+      <div class="closing-card">
+        <div class="closing-lbl">Primeiro dado</div>
+        <div class="closing-val">72h após o kick-off técnico</div>
+      </div>
+      <div class="closing-card">
+        <div class="closing-lbl">Kick-off técnico</div>
+        <div class="closing-val">BM · Pixel · Acesso · Criativos iniciais</div>
+      </div>
+      <div class="closing-card">
+        <div class="closing-lbl">Frequência de reporte</div>
+        <div class="closing-val">Semanal · decisões baseadas em dados</div>
+      </div>
+    </div>
+  </div>
+  <div class="closing-footer">
+    <div class="closing-cta">
+      O próximo passo é <strong>um kick-off técnico</strong> para alinhar BM,<br>acessos e criativos iniciais — e já partir na segunda-feira.
+    </div>
+    <div class="closing-brand">
+      <div class="closing-brand-name">v4company.com.br</div>
+      <div class="closing-brand-sub">Agosto 2026 · Confidencial</div>
+    </div>
+  </div>
+</section>
 
 <script>
-  const slides = document.querySelectorAll('.slide');
-  const total = slides.length;
-  let current = 0;
+// Active nav highlight on scroll
+const sections = document.querySelectorAll('.pg[id]');
+const links = document.querySelectorAll('.topnav a');
 
-  // Scale deck to fit viewport
-  const deck = document.getElementById('deck');
-  function scaleDeck() {
-    const scaleX = window.innerWidth / 1280;
-    const scaleY = window.innerHeight / 720;
-    const scale = Math.min(scaleX, scaleY) * 0.97;
-    deck.style.transform = `scale(${scale})`;
-  }
-  scaleDeck();
-  window.addEventListener('resize', scaleDeck);
-
-  // Build nav dots
-  const navDots = document.getElementById('navDots');
-  const numEl = document.getElementById('slideNum');
-  for (let i = 0; i < total; i++) {
-    const d = document.createElement('div');
-    d.className = 'dot';
-    d.addEventListener('click', () => goTo(i));
-    navDots.appendChild(d);
-  }
-
-  function goTo(n) {
-    slides[current].classList.remove('active');
-    navDots.children[current].classList.remove('on');
-    current = (n + total) % total;
-    slides[current].classList.add('active');
-    navDots.children[current].classList.add('on');
-    numEl.textContent = `${current + 1} / ${total}`;
-  }
-
-  goTo(0);
-
-  document.addEventListener('keydown', e => {
-    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'ArrowDown') { e.preventDefault(); goTo(current + 1); }
-    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); goTo(current - 1); }
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      links.forEach(l => l.classList.remove('on'));
+      const active = document.querySelector(`.topnav a[href="#${e.target.id}"]`);
+      if (active) {
+        active.classList.add('on');
+        active.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+      }
+    }
   });
+}, { threshold: 0.4 });
 
-  // Touch/swipe support
-  let touchStartX = 0;
-  document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
-  document.addEventListener('touchend', e => {
-    const dx = touchStartX - e.changedTouches[0].clientX;
-    if (Math.abs(dx) > 40) dx > 0 ? goTo(current + 1) : goTo(current - 1);
-  }, { passive: true });
+sections.forEach(s => obs.observe(s));
 </script>
