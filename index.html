@@ -1012,10 +1012,12 @@ body {
     </div>
     <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:48px 32px;background:var(--ink);border-radius:16px;text-align:center;">
       <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--red);">Investimento mensal</div>
-      <div id="price-box" onclick="document.getElementById('price-hidden').style.display='none';document.getElementById('price-shown').style.display='block';this.style.cursor='default';" style="cursor:pointer;user-select:none;">
+      <div id="price-box" onclick="document.getElementById('price-hidden').style.display='none';document.getElementById('price-shown').style.display='block';this.style.cursor='default';this.style.border='none';this.style.background='transparent';" style="cursor:pointer;user-select:none;border:2px dashed rgba(255,255,255,0.25);border-radius:12px;padding:20px 28px;transition:border-color 0.2s;" onmouseover="if(document.getElementById('price-hidden').style.display!=='none')this.style.borderColor='rgba(255,255,255,0.5)';" onmouseout="if(document.getElementById('price-hidden').style.display!=='none')this.style.borderColor='rgba(255,255,255,0.25)';">
         <div id="price-hidden">
-          <div style="font-family:var(--font-d);font-size:clamp(36px,5vw,60px);font-weight:700;color:rgba(255,255,255,0.15);letter-spacing:0.3em;line-height:1;">● ● ●</div>
-          <div style="font-size:11px;color:rgba(255,255,255,0.25);margin-top:10px;letter-spacing:0.05em;">clique para revelar</div>
+          <div style="font-family:var(--font-d);font-size:clamp(36px,5vw,56px);font-weight:700;color:rgba(255,255,255,0.2);letter-spacing:0.25em;line-height:1;">● ● ●</div>
+          <div style="display:inline-flex;align-items:center;gap:6px;margin-top:12px;padding:6px 14px;background:rgba(255,255,255,0.08);border-radius:100px;font-size:11px;font-weight:600;color:rgba(255,255,255,0.5);letter-spacing:0.06em;text-transform:uppercase;">
+            <span>👁</span> clique para revelar
+          </div>
         </div>
         <div id="price-shown" style="display:none;">
           <div style="font-family:var(--font-d);font-size:clamp(36px,5vw,60px);font-weight:700;color:#fff;letter-spacing:-0.02em;line-height:1;">R$ <span style="color:var(--red);">8.000</span></div>
